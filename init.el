@@ -1062,4 +1062,30 @@ _c_lose node   _p_revious fold   toggle _a_ll        e_x_it
    ("a" origami-toggle-all-nodes)
    ("F" fill-column)
    ("x" nil :color blue))))))
+
 (put 'downcase-region 'disabled nil)
+
+(use-package macrostep)
+
+(defvar sql-connection-alist nil)
+
+(defmacro sql-specify-connections (&rest connections)
+  "Set the sql-connection-alist from CONNECTIONS.
+Generates respective interactive functions to establish each
+connection."
+  `(progn
+     ,@(mapcar (lambda (conn)
+		 `(add-to-list 'sql-connection-alist ',conn))
+	       connections)
+     ,@(mapcar (lambda (conn)
+		  (let* ((varname (car conn))
+			 (fn-name (intern (format "sql-connect-to-%s" varname)))
+			 (buf-name (format "*%s*" varname)))
+		    `(defun ,fn-name ,'()
+		       (interactive)
+		       (sql-connect ',varname ,buf-name))))
+	       connections)))
+
+(when (file-exists-p "./work.el")
+  (message "loading work sql defns")
+  (load-file "./work.el"))
