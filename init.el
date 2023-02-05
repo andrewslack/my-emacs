@@ -1089,3 +1089,7 @@ connection."
 (when (file-exists-p "./work.el")
   (message "loading work sql defns")
   (load-file "./work.el"))
+
+(global-hl-line-mode +1)
+
+(set-face-background 'hl-line "gray40")
