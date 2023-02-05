@@ -1061,5 +1061,10 @@ _c_lose node   _p_revious fold   toggle _a_ll        e_x_it
    ("f" origami-forward-toggle-node)
    ("a" origami-toggle-all-nodes)
    ("F" fill-column)
-   ("x" nil :color blue))))))
+   ("x" nil :color blue)v)))))
 (put 'downcase-region 'disabled nil)
+
+(global-hl-line-mode +1)
+
+(set-face-background 'hl-line "gray40")
+
