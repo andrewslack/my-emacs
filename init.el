@@ -1,3 +1,4 @@
+
 ;; NOTE: init.el is now generated from Emacs.org.  Please edit that file
 ;;       in Emacs and init.el will be generated automatically!
 
@@ -187,6 +188,8 @@
    ("o" delete-other-windows "del other" :color blue)
    ("i" ace-maximize-window "a1" :color blue)
    ("q" nil "cancel")))
+
+(require 'multiple-cursors)
 
 ;; Multiple Cursors
   ;; https://github.com/magnars/multiple-cursors.el
@@ -752,7 +755,26 @@
   (setq lsp-prefer-flymake nil))
 
 ;; Add metals backend for lsp-mode
-(use-package lsp-metals)
+;; (use-package lsp-metals)
+
+(use-package lsp-metals
+  :ensure t
+  :custom
+  ;; You might set metals server options via -J arguments. This might not always work, for instance when
+  ;; metals is installed using nix. In this case you can use JAVA_TOOL_OPTIONS environment variable.
+  (lsp-metals-server-args '(;; Metals claims to support range formatting by default but it supports range
+                            ;; formatting of multiline strings only. You might want to disable it so that
+                            ;; emacs can use indentation provided by scala-mode.
+                            "-J-Dmetals.allow-multiline-string-formatting=off"
+                            ;; Enable unicode icons. But be warned that emacs might not render unicode
+                            ;; correctly in all cases.
+                            "-J-Dmetals.icons=unicode"))
+  ;; In case you want semantic highlighting. This also has to be enabled in lsp-mode using
+  ;; `lsp-semantic-tokens-enable' variable. Also you might want to disable highlighting of modifiers
+  ;; setting `lsp-semantic-tokens-apply-modifiers' to `nil' because metals sends `abstract' modifier
+  ;; which is mapped to `keyword' face.
+  (lsp-metals-enable-semantic-highlighting t)
+  :hook (scala-mode . lsp))
 
 ;; Use the Debug Adapter Protocol for running tests and debugging
 (use-package posframe
@@ -796,6 +818,7 @@
 
 (use-package counsel
   :bind (("M-x" . helm-M-x)
+         ("C-x b" . helm-buffers-list)	 
          ("C-x f" . counsel-recentf)
          ("C-h v" . counsel-describe-variable)
          ("C-h f" . counsel-describe-function)
@@ -1089,3 +1112,12 @@ connection."
 (when (file-exists-p "./work.el")
   (message "loading work sql defns")
   (load-file "./work.el"))
+
+;; overriding image.el function image-type-available-p
+(defun image-type-available-p (type)
+  "Return t if image type TYPE is available.
+Image types are symbols like `xbm' or `jpeg'."
+  (if (eq 'svg type)
+      nil
+    (and (fboundp 'init-image-library)
+         (init-image-library type))))
